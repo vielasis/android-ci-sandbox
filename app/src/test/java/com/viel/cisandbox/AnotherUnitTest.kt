@@ -12,6 +12,6 @@ class AnotherUnitTest {
 
     @Test
     fun `failing test example`() {
-        assertEquals(7, 4 + 4)
+        assertEquals(8, 4 + 4)
     }
 }
