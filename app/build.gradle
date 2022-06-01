@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+apply from: "../buildscripts/env.gradle"
+
 android {
     compileSdkVersion 31
 
@@ -19,11 +21,13 @@ android {
         debug {
             storeFile file("../keystore/debug.jks")
         }
-        release {
-            storeFile file("../keystore/release.jks")
-            storePassword "android"
-            keyAlias "androidrelease"
-            keyPassword "android"
+        if (specialSigningRequired()) {
+            prd {
+                storeFile file(keystorePath)
+                storePassword readEnv("STORE_PW_${it.name.toUpperCase()}")
+                keyAlias "dash-${it.name}"
+                keyPassword readEnv("KEY_PW_${it.name.toUpperCase()}")
+            }
         }
     }
 
@@ -33,7 +37,7 @@ android {
         }
         release {
             minifyEnabled true
-            signingConfig = signingConfigs.release
+            signingConfig specialSigningRequired() ? signingConfigs.prd : null
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
